@@ -1,24 +1,10 @@
 /**
  * Command Loader
- * Explicitly imports all commands (works in serverless environments)
+ * Automatically loads and registers all commands from the commands directory
  */
 
-// Import all commands explicitly
-const start = require("./start");
-const help = require("./help");
-const about = require("./about");
-
-// Bill commands
-const addbill = require("./bill/addbill");
-const deletebill = require("./bill/deletebill");
-const listbills = require("./bill/listbills");
-const stats = require("./bill/stats");
-
-// Category commands
-const addcategory = require("./category/addcategory");
-const categories = require("./category/categories");
-const deletecategory = require("./category/deletecategory");
-const editcategory = require("./category/editcategory");
+const fs = require("fs");
+const path = require("path");
 
 class CommandHandler {
   constructor() {
@@ -26,32 +12,45 @@ class CommandHandler {
   }
 
   /**
-   * Load all commands
+   * Load all commands from the commands directory
    */
   loadCommands() {
-    // Register all commands
-    const commandList = [
-      start,
-      help,
-      about,
-      addbill,
-      deletebill,
-      listbills,
-      stats,
-      addcategory,
-      categories,
-      deletecategory,
-      editcategory,
-    ];
+    this.loadCommandsFromDirectory(__dirname);
+    console.log(`✅ Loaded ${this.commands.size} commands`);
+  }
 
-    for (const command of commandList) {
-      if (command && command.name) {
-        this.commands.set(command.name, command);
-        console.log(`  📝 Loaded command: ${command.name}`);
+  /**
+   * Recursively load commands from a directory
+   */
+  loadCommandsFromDirectory(dir) {
+    const files = fs.readdirSync(dir);
+
+    for (const file of files) {
+      const filePath = path.join(dir, file);
+      const stat = fs.statSync(filePath);
+
+      // Skip the index.js file
+      if (file === "index.js") continue;
+
+      if (stat.isDirectory()) {
+        // Recursively load commands from subdirectories
+        this.loadCommandsFromDirectory(filePath);
+      } else if (file.endsWith(".js")) {
+        try {
+          const command = require(filePath);
+
+          if (command.name) {
+            this.commands.set(command.name, command);
+            console.log(`  📝 Loaded command: ${command.name}`);
+          }
+        } catch (error) {
+          console.error(
+            `❌ Error loading command from ${filePath}:`,
+            error.message
+          );
+        }
       }
     }
-
-    console.log(`✅ Loaded ${this.commands.size} commands`);
   }
 
   getCommand(name) {
