@@ -1,8 +1,3 @@
-/**
- * Main Application Entry Point
- * Express server with Telegram bot webhook support
- */
-
 require("dotenv").config();
 const express = require("express");
 const bot = require("./bot");
