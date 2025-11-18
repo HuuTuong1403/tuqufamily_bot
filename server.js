@@ -51,6 +51,7 @@ process.once("SIGTERM", () => gracefulShutdown("SIGTERM"));
 
 // Main function
 async function main() {
+  console.log("Hello...");
   try {
     await connectDB();
     console.log("✅ Database connected");
@@ -73,9 +74,8 @@ async function main() {
   }
 }
 
-main();
-
 app.listen(PORT, () => {
+  main();
   console.log(`🚀 Express server is running on port ${PORT}`);
 });
 
