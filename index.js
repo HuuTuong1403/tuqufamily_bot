@@ -5,7 +5,6 @@ const { connectDB } = require("./utils/database");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const WEBHOOK_PATH = `/webhook/${process.env.BOT_TOKEN}`;
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
 
 // Middleware
@@ -19,11 +18,6 @@ app.get("/", (req, res) => {
     message: "Bot is running",
     timestamp: new Date().toISOString(),
   });
-});
-
-// Webhook endpoint for Telegram
-app.post(WEBHOOK_PATH, (req, res) => {
-  bot.handleUpdate(req.body, res);
 });
 
 // Handle graceful shutdown
@@ -51,7 +45,7 @@ async function main() {
     await connectDB();
     console.log("✅ Database connected");
 
-    await bot.launch();
+    await bot.launch({ webhook: { domain: WEBHOOK_URL, port: 8843 } });
   } catch (error) {
     console.error("❌ Failed to start bot:", error);
     process.exit(1);
