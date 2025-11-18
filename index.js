@@ -51,15 +51,7 @@ async function main() {
     await connectDB();
     console.log("✅ Database connected");
 
-    // Set webhook for production, use polling for development
-    if (process.env.NODE_ENV === "production") {
-      await bot.telegram.setWebhook(WEBHOOK_URL);
-      console.log("🔗 Webhook set to:", WEBHOOK_URL);
-    } else {
-      // For local development
-      await bot.launch();
-      console.log("🔄 Bot is running in polling mode (development)");
-    }
+    await bot.launch();
   } catch (error) {
     console.error("❌ Failed to start bot:", error);
     process.exit(1);
