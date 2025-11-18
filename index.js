@@ -43,7 +43,7 @@ async function main() {
   try {
     // Connect to database
     await connectDB();
-    console.log("✅ Database connected");
+    console.log("✅ Database connecteded");
 
     await bot.launch({ webhook: { domain: WEBHOOK_URL, port: 8843 } });
   } catch (error) {
