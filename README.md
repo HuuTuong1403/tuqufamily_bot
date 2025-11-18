@@ -49,6 +49,9 @@ npm install
 ```env
 BOT_TOKEN=your_bot_token_here
 MONGODB_URI=your_mongodb_uri_here
+# WEBHOOK_URL= (leave empty for local development)
+PORT=3000
+NODE_ENV=development
 ```
 
 3. Start the bot:
@@ -56,6 +59,14 @@ MONGODB_URI=your_mongodb_uri_here
 ```bash
 npm start
 ```
+
+## 🌐 Deployment
+
+For production deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
+
+The bot automatically uses:
+- **Polling mode** for local development (when `WEBHOOK_URL` is not set)
+- **Webhook mode** for production (when `WEBHOOK_URL` is set)
 
 ## 📝 Adding New Commands
 
