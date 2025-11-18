@@ -75,6 +75,7 @@ async function main() {
 
 // Start the application
 main().then(() => {
+  console.log("Test");
   app.listen(PORT, () => {
     console.log(`🚀 Express server is running on port ${PORT}`);
   });
