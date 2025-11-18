@@ -11,8 +11,7 @@ const { connectDB } = require("./utils/database");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const WEBHOOK_PATH = `/webhook/${process.env.BOT_TOKEN}`;
-const WEBHOOK_URL =
-  process.env.WEBHOOK_URL || `https://your-app.vercel.app${WEBHOOK_PATH}`;
+const WEBHOOK_URL = process.env.WEBHOOK_URL;
 
 // Middleware
 app.use(express.json());
