@@ -52,6 +52,7 @@ process.once("SIGTERM", () => gracefulShutdown("SIGTERM"));
 // Main function
 async function main() {
   try {
+    // Connect to database
     await connectDB();
     console.log("✅ Database connected");
 
@@ -66,16 +67,17 @@ async function main() {
     }
 
     console.log(`Bot username: @${bot.botInfo.username}`);
-    // Connect to database
   } catch (error) {
     console.error("❌ Failed to start bot:", error);
     process.exit(1);
   }
 }
 
-app.listen(PORT, () => {
-  main();
-  console.log(`🚀 Express server is running on port ${PORT}`);
+// Start the application
+main().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Express server is running on port ${PORT}`);
+  });
 });
 
 // Export for Vercel serverless
