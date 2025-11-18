@@ -60,8 +60,6 @@ async function main() {
       await bot.launch();
       console.log("🔄 Bot is running in polling mode (development)");
     }
-
-    console.log(`Bot username: @${bot.botInfo.username}`);
   } catch (error) {
     console.error("❌ Failed to start bot:", error);
     process.exit(1);
