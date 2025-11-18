@@ -51,7 +51,6 @@ process.once("SIGTERM", () => gracefulShutdown("SIGTERM"));
 
 // Main function
 async function main() {
-  console.log("Hello...");
   try {
     await connectDB();
     console.log("✅ Database connected");
