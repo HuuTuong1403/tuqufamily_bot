@@ -3,20 +3,20 @@
  * Helper functions for database operations
  */
 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 /**
  * Connect to MongoDB
  */
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
+    await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log('✅ Connected to MongoDB');
+    console.log("✅ Connected to MongoDB");
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
+    console.error("❌ MongoDB connection error:", error);
     process.exit(1);
   }
 };
@@ -27,9 +27,9 @@ const connectDB = async () => {
 const disconnectDB = async () => {
   try {
     await mongoose.disconnect();
-    console.log('✅ Disconnected from MongoDB');
+    console.log("✅ Disconnected from MongoDB");
   } catch (error) {
-    console.error('❌ MongoDB disconnection error:', error);
+    console.error("❌ MongoDB disconnection error:", error);
   }
 };
 
@@ -43,6 +43,5 @@ const isConnected = () => {
 module.exports = {
   connectDB,
   disconnectDB,
-  isConnected
+  isConnected,
 };
-

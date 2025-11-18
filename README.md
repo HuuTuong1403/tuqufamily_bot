@@ -39,17 +39,20 @@ tuqufamily_bot/
 ## 🚀 Setup
 
 1. Install dependencies:
+
 ```bash
 npm install
 ```
 
 2. Create a `.env` file with the following variables:
+
 ```env
 BOT_TOKEN=your_bot_token_here
-MONGO_URI=your_mongodb_uri_here
+MONGODB_URI=your_mongodb_uri_here
 ```
 
 3. Start the bot:
+
 ```bash
 npm start
 ```
@@ -61,16 +64,16 @@ To add a new command, create a new file in the `commands/` directory (or subdire
 ```javascript
 // commands/mycommand.js
 module.exports = {
-  name: 'mycommand',
-  description: 'Description of my command',
-  category: 'general', // optional
+  name: "mycommand",
+  description: "Description of my command",
+  category: "general", // optional
   adminOnly: false, // optional, default false
-  usage: '/mycommand <args>', // optional
-  
+  usage: "/mycommand <args>", // optional
+
   async execute(ctx, args) {
     // Your command logic here
-    await ctx.reply('Command executed!');
-  }
+    await ctx.reply("Command executed!");
+  },
 };
 ```
 
@@ -79,6 +82,7 @@ The command will be automatically loaded on bot startup.
 ## 🔧 Available Commands
 
 ### General Commands
+
 - `/start` - Welcome message
 - `/help` - List of commands
 - `/about` - Bot information
@@ -92,6 +96,7 @@ The command will be automatically loaded on bot startup.
 ## 💾 Database
 
 The bot uses MongoDB to store user data. The User model includes:
+
 - Telegram user info (ID, username, name)
 - Join date
 
@@ -106,6 +111,7 @@ The bot uses MongoDB to store user data. The User model includes:
 ## 🔄 Development
 
 The project uses a modular architecture:
+
 - Commands are automatically loaded from the `commands/` directory
 - Middlewares are applied globally in `bot.js`
 - Database utilities are in `utils/database.js`
@@ -114,4 +120,3 @@ The project uses a modular architecture:
 ## 📄 License
 
 ISC
-
