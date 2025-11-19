@@ -77,7 +77,7 @@ module.exports = {
 
       await ctx.reply(
         `✅ *Đã cập nhật loại hóa đơn!*\n\n` +
-          `${updatedCategory.icon} *${updatedCategory.displayName}*\n` +
+          `${updatedCategory.icon} *${updatedCategory.code}*\n` +
           `• Tên: ${updatedCategory.name}\n` +
           `• Mô tả: ${updatedCategory.description || "Không có"}\n` +
           `• Đã dùng: ${updatedCategory.usageCount} lần`,

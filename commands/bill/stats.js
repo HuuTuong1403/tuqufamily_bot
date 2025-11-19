@@ -40,6 +40,7 @@ module.exports = {
         month,
         year
       );
+      console.log("🚀 => byCategory:", byCategory)
 
       if (monthlyTotal.count === 0) {
         return ctx.reply(
@@ -56,9 +57,6 @@ module.exports = {
       const formattedTotal = monthlyTotal.total.toLocaleString("vi-VN");
       message += `💰 *Tổng chi tiêu:* ${formattedTotal} VNĐ\n`;
       message += `📝 *Số hóa đơn:* ${monthlyTotal.count}\n`;
-      message += `📈 *Trung bình/hóa đơn:* ${Math.round(
-        monthlyTotal.total / monthlyTotal.count
-      ).toLocaleString("vi-VN")} VNĐ\n\n`;
 
       // By category with percentage
       message += `*📋 Chi tiết theo loại:*\n\n`;
@@ -67,7 +65,7 @@ module.exports = {
         const formatted = cat.total.toLocaleString("vi-VN");
         const bars = "█".repeat(Math.ceil(parseFloat(percentage) / 10));
 
-        message += `${index + 1}. *${cat._id}*\n`;
+        message += `${index + 1}. *${cat._id.name}*\n`;
         message += `   💵 ${formatted} VNĐ (${percentage}%)\n`;
         message += `   ${bars}\n`;
         message += `   📊 ${cat.count} hóa đơn\n\n`;

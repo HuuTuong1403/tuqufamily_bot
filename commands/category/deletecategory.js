@@ -9,16 +9,16 @@ const Bill = require("../../models/Bill");
 module.exports = {
   name: "deletecategory",
   description: "Xóa loại hóa đơn",
-  usage: "/deletecategory <tên>",
+  usage: "/deletecategory <mã>",
 
   async execute(ctx, args) {
     if (args.length === 0) {
       return ctx.reply(
-        `❌ *Thiếu tên loại!*\n\n` +
-          `*Cách dùng:* /deletecategory <tên>\n\n` +
+        `❌ *Thiếu mã loại!*\n\n` +
+          `*Cách dùng:* /deletecategory <mã>\n\n` +
           `*Ví dụ:*\n` +
-          `/deletecategory "y tế"\n` +
-          `/deletecategory laptop\n\n` +
+          `/deletecategory yte\n` +
+          `/deletecategory giaothong\n\n` +
           `Dùng /categories để xem danh sách`,
         { parse_mode: "Markdown" }
       );

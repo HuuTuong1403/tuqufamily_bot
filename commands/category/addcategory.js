@@ -17,10 +17,10 @@ module.exports = {
         `❌ *Cú pháp không đúng!*\n\n` +
           `*Cách dùng:* /addcategory <mã> <tên> [icon] [mô tả]\n\n` +
           `*Ví dụ:*\n` +
-          `/addcategory "y_te" "Y tế" 💊 "Khám bệnh, thuốc men"\n` +
-          `/addcategory "giao_thong" "Giao thông" 🚗\n` +
+          `/addcategory yte Y tế 💊 Khám bệnh, thuốc men\n` +
+          `/addcategory giaothong Giao thông 🚗\n` +
           `/addcategory laptop Laptop 💻\n\n` +
-          `💡 *Lưu ý:* Nếu tên có khoảng trắng, đặt trong dấu ngoặc kép`,
+          `💡 *Lưu ý:* Nếu tên có khoảng trắng, nối với nhau bằng dấu gạch dưới`,
         { parse_mode: "Markdown" }
       );
     }

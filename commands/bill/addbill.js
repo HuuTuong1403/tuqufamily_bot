@@ -37,13 +37,14 @@ module.exports = {
           }` +
           `*Ví dụ:*\n` +
           `/addbill dien 500000 Tiền điện tháng 11\n` +
-          `/addbill an_uong 250000 Đi chợ cuối tuần\n\n` +
+          `/addbill anuong 250000 Đi chợ cuối tuần\n\n` +
           `Dùng /categories để xem tất cả loại`,
         { parse_mode: "Markdown" }
       );
     }
 
     const category = args[0].toLowerCase();
+    console.log("🚀 => category:", category);
     const amount = parseFloat(args[1]);
     const description = args.slice(2).join(" ");
 
@@ -52,7 +53,7 @@ module.exports = {
     if (!categoryExists) {
       return ctx.reply(
         `❌ *Loại hóa đơn không tồn tại!*\n\n` +
-          `Loại "${category}" chưa có trong danh sách của bạn.\n\n` +
+          `Loại bạn vừa nhập chưa có trong danh sách của bạn.\n\n` +
           `Dùng /categories để xem danh sách loại\n` +
           `Hoặc /addcategory để thêm loại mới`,
         { parse_mode: "Markdown" }
@@ -87,7 +88,6 @@ module.exports = {
 
       // Increment category usage count
       await Category.incrementUsage(ctx.from.id, category);
-    
 
       const formattedAmount = amount.toLocaleString("vi-VN");
       const displayCategory = `${categoryInfo.icon} ${categoryInfo.name}`;
@@ -95,6 +95,7 @@ module.exports = {
       await ctx.reply(
         `✅ *Đã thêm hóa đơn thành công!*\n\n` +
           `📝 *Chi tiết:*\n` +
+          `• Mã: \`${bill.code}\`\n` +
           `• Loại: ${displayCategory}\n` +
           `• Số tiền: ${formattedAmount} VNĐ\n` +
           `• Mô tả: ${description || "Không có"}\n` +

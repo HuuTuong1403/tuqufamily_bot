@@ -28,7 +28,7 @@ module.exports = {
         message += `*🔧 Loại mặc định:*\n`;
         defaultCategories.forEach((cat) => {
           const usage = cat.usageCount > 0 ? ` (${cat.usageCount}x)` : "";
-          message += `${cat.icon} *${cat.name}* - ${cat.description}${usage}\n`;
+          message += `${cat.icon} Mã: *${cat.code}* - Tên: ${cat.name}\n- Mô tả: ${cat.description}${usage}\n`;
         });
         message += `\n`;
       }
@@ -37,7 +37,7 @@ module.exports = {
         message += `*⭐ Loại tùy chỉnh:*\n`;
         customCategories.forEach((cat) => {
           const usage = cat.usageCount > 0 ? ` (${cat.usageCount}x)` : "";
-          message += `${cat.icon} *${cat.name}* - ${cat.description}${usage}\n`;
+          message += `${cat.icon} Mã: *${cat.code}* - Tên: ${cat.name}\n- Mô tả: ${cat.description}${usage}\n`;
         });
         message += `\n`;
       }
@@ -50,7 +50,7 @@ module.exports = {
       message += `• /deletecategory - Xóa loại\n\n`;
 
       message += `*🔍 Cách dùng:*\n`;
-      message += `\`/addbill <loại> <số tiền> <mô tả>\`\n`;
+      message += `\`/addbill <mã loại> <số tiền> <mô tả>\`\n`;
       message += `Ví dụ: \`/addbill điện 500000 Tiền điện\``;
 
       await ctx.reply(message, { parse_mode: "Markdown" });

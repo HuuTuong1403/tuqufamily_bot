@@ -17,6 +17,10 @@ module.exports = {
 \`/addbill <loại> <số tiền> <mô tả>\`
 Ví dụ: \`/addbill điện 500000 Tiền điện tháng 11\`
 
+✏️ *Sửa hóa đơn:*
+\`/editbill <mã> <trường> <giá trị mới>\`
+Ví dụ: \`/editbill bill1 amount 600000\`
+
 📋 *Xem danh sách:*
 \`/listbills\` - Xem hóa đơn tháng này
 \`/listbills 10 2025\` - Xem hóa đơn tháng 10/2025
@@ -25,8 +29,12 @@ Ví dụ: \`/addbill điện 500000 Tiền điện tháng 11\`
 \`/stats\` - Thống kê tháng này
 \`/stats 10 2025\` - Thống kê tháng 10/2025
 
+✅ *Thanh toán hóa đơn:*
+\`/paidbill <mã>\` - Đánh dấu hóa đơn đã thanh toán
+\`/unpaidbill <mã>\` - Đánh dấu hóa đơn chưa thanh toán
+
 🗑️ *Xóa hóa đơn:*
-\`/deletebill <ID>\` - Xóa hóa đơn theo ID
+\`/deletebill <mã>\` - Xóa hóa đơn theo mã
 
 *🏷️ Quản lý loại hóa đơn:*
 /categories - Xem danh sách loại

@@ -52,7 +52,11 @@ module.exports = {
       const byCategory = {};
       bills.forEach((bill) => {
         if (!byCategory[bill.category]) {
-          byCategory[bill.category] = { total: 0, count: 0 };
+          byCategory[bill.category] = {
+            total: 0,
+            count: 0,
+            name: bill.category.name,
+          };
         }
         byCategory[bill.category].total += bill.amount;
         byCategory[bill.category].count += 1;
@@ -66,30 +70,45 @@ module.exports = {
         .sort((a, b) => b[1].total - a[1].total)
         .forEach(([cat, data]) => {
           const formatted = data.total.toLocaleString("vi-VN");
-          message += `• ${cat}: ${formatted} VNĐ (${data.count} hóa đơn)\n`;
+          message += `• ${data.name}: ${formatted} VNĐ (${data.count} hóa đơn)\n`;
         });
 
       message += `\n*💰 Tổng cộng:* ${total.toLocaleString("vi-VN")} VNĐ\n`;
       message += `*📝 Số lượng:* ${bills.length} hóa đơn\n\n`;
 
-      // List recent bills (limit to 10)
       message += `*📋 Chi tiết (10 gần nhất):*\n`;
       bills.slice(0, 10).forEach((bill, index) => {
         const date = new Date(bill.date).toLocaleDateString("vi-VN");
         const formatted = bill.amount.toLocaleString("vi-VN");
-        message += `\n${index + 1}. *${bill.category}* - ${formatted} VNĐ\n`;
-        message += `   📅 ${date}`;
+        message += `\n${index + 1}. *${
+          bill.category.name
+        }* - ${formatted} VNĐ ${bill.isPaid ? "✅" : "❌"}\n`;
+        message += `   Mã: \`${bill.code}\``;
+        message += `\n   Ngày: ${date}`;
         if (bill.description) {
-          message += `\n   💬 ${bill.description}`;
+          message += `\n   Mô tả: ${bill.description}`;
         }
-        message += `\n   🆔 ID: \`${bill._id}\`\n`;
+        message += `\n   Người trả: ${bill.username}`;
+        message += `\n   Trạng thái: ${
+          bill.isPaid ? "Đã thanh toán" : "Chưa thanh toán"
+        }`;
+        if (bill.isPaid) {
+          message += `\n   Ngày thanh toán: ${new Date(
+            bill.paidDate
+          ).toLocaleDateString("vi-VN")}`;
+        }
+        message += `\n`;
       });
 
       if (bills.length > 10) {
         message += `\n_...và ${bills.length - 10} hóa đơn khác_`;
       }
 
-      message += `\n\n📌 Dùng /deletebill <ID> để xóa hóa đơn`;
+      message += `\n\n📌 *Lệnh hữu ích:*\n`;
+      message += `• /editbill <mã> <trường> <giá trị> - Sửa hóa đơn\n`;
+      message += `• /paidbill <mã> - Đánh dấu đã thanh toán\n`;
+      message += `• /unpaidbill <mã> - Đánh dấu chưa thanh toán\n`;
+      message += `• /deletebill <mã> - Xóa hóa đơn`;
 
       await ctx.reply(message, { parse_mode: "Markdown" });
     } catch (error) {

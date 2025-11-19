@@ -98,6 +98,25 @@ The command will be automatically loaded on bot startup.
 - `/help` - List of commands
 - `/about` - Bot information
 
+### Bill Management (Quản lý hóa đơn)
+
+- `/addbill <loại> <số tiền> <mô tả>` - Add a new bill
+- `/editbill <mã> <field> <value>` - Edit a bill (field: category, amount, description)
+- `/listbills [tháng] [năm]` - List bills for a month
+- `/paidbill <mã>` - Mark bill as paid
+- `/unpaidbill <mã>` - Mark bill as unpaid
+- `/deletebill <mã>` - Delete a bill
+- `/stats [tháng] [năm]` - View statistics
+
+**Note:** Each bill has an auto-generated code like `bill1`, `bill2`, `bill3`... which is easier to use than MongoDB IDs.
+
+### Category Management (Quản lý loại)
+
+- `/categories` - List all categories
+- `/addcategory` - Add new category
+- `/editcategory` - Edit category
+- `/deletecategory` - Delete category
+
 ## 🛠️ Middlewares
 
 - **Logger**: Logs all incoming messages and response times

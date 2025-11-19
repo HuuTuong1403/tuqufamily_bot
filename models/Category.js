@@ -59,13 +59,13 @@ categorySchema.statics.getUserCategories = async function (userId) {
 categorySchema.statics.initDefaultCategories = async function (userId) {
   const defaultCategories = [
     {
-      code: "thue_nha",
+      code: "thuenha",
       name: "Thuê nhà",
       icon: "🏠",
       description: "Tiền thuê nhà, phòng trọ",
     },
     {
-      code: "an_uong",
+      code: "anuong",
       name: "Ăn uống",
       icon: "🍜",
       description: "Đi chợ, ăn ngoài, thực phẩm",
@@ -99,7 +99,7 @@ categorySchema.statics.initDefaultCategories = async function (userId) {
 // Static method to increment usage count
 categorySchema.statics.incrementUsage = async function (userId, categoryCode) {
   await this.updateOne(
-    { userId, name: categoryCode.toLowerCase() },
+    { userId, code: categoryCode },
     { $inc: { usageCount: 1 } }
   );
 };
@@ -108,7 +108,7 @@ categorySchema.statics.incrementUsage = async function (userId, categoryCode) {
 categorySchema.statics.categoryExists = async function (userId, categoryCode) {
   const count = await this.countDocuments({
     userId,
-    name: categoryCode.toLowerCase(),
+    code: categoryCode,
   });
   return count > 0;
 };

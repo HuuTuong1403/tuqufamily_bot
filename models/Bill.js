@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const billSchema = new mongoose.Schema(
   {
+    code: {
+      type: String,
+      index: true,
+      unique: true,
+    },
     userId: {
       type: Number,
       required: true,
@@ -36,6 +41,14 @@ const billSchema = new mongoose.Schema(
     year: {
       type: Number,
       required: true,
+    },
+    isPaid: {
+      type: Boolean,
+      default: false,
+    },
+    paidDate: {
+      type: Date,
+      default: null,
     },
   },
   {
@@ -91,5 +104,32 @@ billSchema.statics.getMonthlyTotal = async function (userId, month, year) {
 
   return result.length > 0 ? result[0] : { total: 0, count: 0 };
 };
+
+// Static method to generate next bill code
+billSchema.statics.getNextCode = async function () {
+  // Find all bills with bill codes
+  const bills = await this.find({ code: /^bill\d+$/ }, { code: 1 }).lean();
+
+  if (bills.length === 0) {
+    return "bill1";
+  }
+
+  // Extract all numbers and find the maximum
+  const numbers = bills.map((bill) => {
+    const match = bill.code.match(/^bill(\d+)$/);
+    return match ? parseInt(match[1]) : 0;
+  });
+
+  const maxNumber = Math.max(...numbers);
+  return `bill${maxNumber + 1}`;
+};
+
+// Pre-save hook to auto-generate code if not provided
+billSchema.pre("save", async function (next) {
+  if (this.isNew && !this.code) {
+    this.code = await this.constructor.getNextCode();
+  }
+  next();
+});
 
 module.exports = mongoose.model("Bill", billSchema);

@@ -8,24 +8,24 @@ const Bill = require("../../models/Bill");
 module.exports = {
   name: "deletebill",
   description: "Xóa hóa đơn",
-  usage: "/deletebill <ID>",
+  usage: "/deletebill <mã>",
 
   async execute(ctx, args) {
     if (args.length === 0) {
       return ctx.reply(
-        `❌ *Thiếu ID hóa đơn!*\n\n` +
-          `*Cách dùng:* /deletebill <ID>\n\n` +
-          `Dùng /listbills để xem ID các hóa đơn`,
+        `❌ *Thiếu mã hóa đơn!*\n\n` +
+          `*Cách dùng:* /deletebill <mã>\n\n` +
+          `Dùng /listbills để xem mã các hóa đơn`,
         { parse_mode: "Markdown" }
       );
     }
 
-    const billId = args[0];
+    const billCode = args[0];
 
     try {
       // Find the bill and check ownership
       const bill = await Bill.findOne({
-        _id: billId,
+        code: billCode,
         userId: ctx.from.id,
       });
 
@@ -47,7 +47,7 @@ module.exports = {
       };
 
       // Delete the bill
-      await Bill.deleteOne({ _id: billId });
+      await Bill.deleteOne({ code: billCode });
 
       const formattedAmount = billInfo.amount.toLocaleString("vi-VN");
 
