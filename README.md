@@ -100,15 +100,18 @@ The command will be automatically loaded on bot startup.
 
 ### Bill Management (Quản lý hóa đơn)
 
-- `/addbill <loại> <số tiền> <mô tả>` - Add a new bill
-- `/editbill <mã> <field> <value>` - Edit a bill (field: category, amount, description)
+- `/addbill <loại> <số tiền> [DD/MM/YYYY] <mô tả>` - Add a new bill (date is optional)
+- `/editbill <mã> <field> <value>` - Edit a bill (field: category, amount, description, date)
 - `/listbills [tháng] [năm]` - List bills for a month
 - `/paidbill <mã>` - Mark bill as paid
 - `/unpaidbill <mã>` - Mark bill as unpaid
 - `/deletebill <mã>` - Delete a bill
 - `/stats [tháng] [năm]` - View statistics
 
-**Note:** Each bill has an auto-generated code like `bill1`, `bill2`, `bill3`... which is easier to use than MongoDB IDs.
+**Notes:** 
+- Each bill has an auto-generated code like `bill1`, `bill2`, `bill3`... which is easier to use than MongoDB IDs.
+- You can specify a date when adding bills: `/addbill dien 500000 15/11/2025 Tiền điện`
+- If no date is provided, current date will be used.
 
 ### Category Management (Quản lý loại)
 

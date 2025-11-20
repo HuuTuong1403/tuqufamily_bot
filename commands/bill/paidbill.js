@@ -4,6 +4,7 @@
  */
 
 const Bill = require("../../models/Bill");
+const { escapeMarkdown } = require("../../utils/response");
 
 module.exports = {
   name: "paidbill",
@@ -63,12 +64,12 @@ module.exports = {
       await ctx.reply(
         `✅ *Đã đánh dấu hóa đơn đã thanh toán!*\n\n` +
           `📝 *Thông tin hóa đơn:*\n` +
-          `• Loại: ${bill.category.name}\n` +
+          `• Loại: ${escapeMarkdown(bill.category.name)}\n` +
           `• Số tiền: ${formattedAmount} VNĐ\n` +
-          `• Mô tả: ${bill.description || "Không có"}\n` +
+          `• Mô tả: ${escapeMarkdown(bill.description) || "Không có"}\n` +
           `• Ngày tạo: ${billDate}\n` +
           `• Ngày thanh toán: ${paidDate}\n` +
-          `• Người trả: ${bill.username}\n\n` +
+          `• Người trả: ${escapeMarkdown(bill.username)}\n\n` +
           `💡 Dùng /stats để xem thống kê chi tiêu`,
         { parse_mode: "Markdown" }
       );

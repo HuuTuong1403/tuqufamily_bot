@@ -11,7 +11,6 @@ module.exports = {
   usage: "/addcategory <mã> <tên> [icon] [mô tả]",
 
   async execute(ctx, args) {
-    console.log("🚀 => args:", args);
     if (args.length < 2) {
       return ctx.reply(
         `❌ *Cú pháp không đúng!*\n\n` +
@@ -39,7 +38,7 @@ module.exports = {
 
     try {
       // Check if category already exists
-      const exists = await Category.categoryExists(ctx.from.id, code);
+      const exists = await Category.categoryExists(code);
       if (exists) {
         return ctx.reply(
           `❌ *Loại hóa đơn đã tồn tại!*\n\n` +
@@ -51,7 +50,6 @@ module.exports = {
 
       // Create new category
       const category = await Category.create({
-        userId: ctx.from.id,
         code: code,
         name: name,
         icon: icon,

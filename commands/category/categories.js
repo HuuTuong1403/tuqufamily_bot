@@ -12,10 +12,10 @@ module.exports = {
   async execute(ctx) {
     try {
       // Initialize default categories if user has none
-      let categories = await Category.getUserCategories(ctx.from.id);
+      let categories = await Category.getCategories();
 
       if (categories.length === 0) {
-        categories = await Category.initDefaultCategories(ctx.from.id);
+        categories = await Category.initDefaultCategories();
       }
 
       let message = `📋 *Danh sách loại hóa đơn của bạn*\n\n`;

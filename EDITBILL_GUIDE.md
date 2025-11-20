@@ -26,7 +26,15 @@
 
 **Lưu ý:** Số tiền phải là số dương (> 0).
 
-### 3. **description** - Thay đổi mô tả
+### 3. **date** - Thay đổi ngày
+```
+/editbill bill1 date 15/11/2025
+/editbill bill2 date 01/10/2025
+```
+
+**Lưu ý:** Ngày phải theo định dạng DD/MM/YYYY. Tháng và năm sẽ tự động cập nhật theo.
+
+### 4. **description** - Thay đổi mô tả
 ```
 /editbill bill1 description Tiền điện tháng 11 đã cập nhật
 /editbill bill2 description Đi chợ mua đồ ăn

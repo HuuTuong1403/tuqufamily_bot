@@ -29,7 +29,6 @@ module.exports = {
     try {
       // Find the category
       const category = await Category.findOne({
-        userId: ctx.from.id,
         code: code,
       });
 
@@ -54,7 +53,6 @@ module.exports = {
 
       // Check if there are bills using this category
       const billCount = await Bill.countDocuments({
-        userId: ctx.from.id,
         category: code,
       });
 

@@ -14,12 +14,14 @@ module.exports = {
 *💰 Quản lý hóa đơn:*
 
 📝 *Thêm hóa đơn:*
-\`/addbill <loại> <số tiền> <mô tả>\`
-Ví dụ: \`/addbill điện 500000 Tiền điện tháng 11\`
+\`/addbill <loại> <số tiền> [DD/MM/YYYY] <mô tả>\`
+Ví dụ: \`/addbill dien 500000 Tiền điện\`
+Hoặc: \`/addbill dien 500000 15/11/2025 Tiền điện\`
 
 ✏️ *Sửa hóa đơn:*
 \`/editbill <mã> <trường> <giá trị mới>\`
 Ví dụ: \`/editbill bill1 amount 600000\`
+Hoặc: \`/editbill bill1 date 15/11/2025\`
 
 📋 *Xem danh sách:*
 \`/listbills\` - Xem hóa đơn tháng này

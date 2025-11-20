@@ -4,6 +4,7 @@
  */
 
 const Bill = require("../../models/Bill");
+const { escapeMarkdown } = require("../../utils/response");
 
 module.exports = {
   name: "listbills",
@@ -80,15 +81,15 @@ module.exports = {
       bills.slice(0, 10).forEach((bill, index) => {
         const date = new Date(bill.date).toLocaleDateString("vi-VN");
         const formatted = bill.amount.toLocaleString("vi-VN");
-        message += `\n${index + 1}. *${
+        message += `\n${index + 1}. *${escapeMarkdown(
           bill.category.name
-        }* - ${formatted} VNĐ ${bill.isPaid ? "✅" : "❌"}\n`;
+        )}* - ${formatted} VNĐ ${bill.isPaid ? "✅" : "❌"}\n`;
         message += `   Mã: \`${bill.code}\``;
         message += `\n   Ngày: ${date}`;
         if (bill.description) {
-          message += `\n   Mô tả: ${bill.description}`;
+          message += `\n   Mô tả: ${escapeMarkdown(bill.description)}`;
         }
-        message += `\n   Người trả: ${bill.username}`;
+        message += `\n   Người trả: ${escapeMarkdown(bill.username)}`;
         message += `\n   Trạng thái: ${
           bill.isPaid ? "Đã thanh toán" : "Chưa thanh toán"
         }`;

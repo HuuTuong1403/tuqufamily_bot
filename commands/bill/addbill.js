@@ -1,33 +1,72 @@
 /**
  * /addbill command handler
  * Thêm hóa đơn chi tiêu
- * Cú pháp: /addbill <loại> <số tiền> <mô tả>
+ * Cú pháp: /addbill <loại> <số tiền> [DD/MM/YYYY] <mô tả>
  */
 
 const Bill = require("../../models/Bill");
 const Category = require("../../models/Category");
+const { escapeMarkdown } = require("../../utils/response");
+
+// Helper function to parse date
+function parseDate(dateStr) {
+  const datePattern = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+  const match = dateStr.match(datePattern);
+
+  if (!match) return null;
+
+  const day = parseInt(match[1]);
+  const month = parseInt(match[2]);
+  const year = parseInt(match[3]);
+
+  // Validate ranges
+  if (
+    day < 1 ||
+    day > 31 ||
+    month < 1 ||
+    month > 12 ||
+    year < 2000 ||
+    year > 2100
+  ) {
+    return null;
+  }
+
+  // Create date object
+  const date = new Date(year, month - 1, day);
+
+  // Check if date is valid (handles invalid dates like 31/02/2025)
+  if (
+    date.getDate() !== day ||
+    date.getMonth() !== month - 1 ||
+    date.getFullYear() !== year
+  ) {
+    return null;
+  }
+
+  return date;
+}
 
 module.exports = {
   name: "addbill",
   description: "Thêm hóa đơn sinh hoạt",
-  usage: "/addbill <mã loại> <số tiền> <mô tả>",
+  usage: "/addbill <mã loại> <số tiền> [DD/MM/YYYY] <mô tả>",
 
   async execute(ctx, args) {
     if (args.length < 2) {
       // Get user's categories to show in help
-      let categories = await Category.getUserCategories(ctx.from.id);
+      let categories = await Category.getCategories();
       if (categories.length === 0) {
-        categories = await Category.initDefaultCategories(ctx.from.id);
+        categories = await Category.initDefaultCategories();
       }
 
       const categoryList = categories
         .slice(0, 7)
-        .map((c) => `• ${c.name}`)
+        .map((c) => `• Mã ${c.code} - Tên: ${c.name}`)
         .join("\n");
 
       return ctx.reply(
         `❌ *Cú pháp không đúng!*\n\n` +
-          `*Cách dùng:* /addbill <loại> <số tiền> <mô tả>\n\n` +
+          `*Cách dùng:* /addbill <loại> <số tiền> [ngày] <mô tả>\n\n` +
           `*Một số loại hóa đơn:*\n` +
           `${categoryList}\n` +
           `${
@@ -37,19 +76,33 @@ module.exports = {
           }` +
           `*Ví dụ:*\n` +
           `/addbill dien 500000 Tiền điện tháng 11\n` +
-          `/addbill anuong 250000 Đi chợ cuối tuần\n\n` +
+          `/addbill anuong 250000 15/11/2025 Đi chợ\n` +
+          `/addbill nuoc 200000 01/10/2025 Tiền nước\n\n` +
+          `💡 Ngày có format DD/MM/YYYY, để trống sẽ dùng ngày hôm nay\n\n` +
           `Dùng /categories để xem tất cả loại`,
         { parse_mode: "Markdown" }
       );
     }
 
     const category = args[0].toLowerCase();
-    console.log("🚀 => category:", category);
     const amount = parseFloat(args[1]);
-    const description = args.slice(2).join(" ");
+
+    // Check if args[2] is a date
+    let billDate = new Date();
+    let descriptionStartIndex = 2;
+
+    if (args.length >= 3) {
+      const parsedDate = parseDate(args[2]);
+      if (parsedDate) {
+        billDate = parsedDate;
+        descriptionStartIndex = 3;
+      }
+    }
+
+    const description = args.slice(descriptionStartIndex).join(" ");
 
     // Validate category from database
-    const categoryExists = await Category.categoryExists(ctx.from.id, category);
+    const categoryExists = await Category.categoryExists(category);
     if (!categoryExists) {
       return ctx.reply(
         `❌ *Loại hóa đơn không tồn tại!*\n\n` +
@@ -69,9 +122,7 @@ module.exports = {
     }
 
     try {
-      const now = new Date();
       const categoryInfo = await Category.findOne({
-        userId: ctx.from.id,
         code: category,
       });
 
@@ -81,9 +132,9 @@ module.exports = {
         category: { code: categoryInfo.code, name: categoryInfo.name },
         amount: amount,
         description: description,
-        date: now,
-        month: now.getMonth() + 1,
-        year: now.getFullYear(),
+        date: billDate,
+        month: billDate.getMonth() + 1,
+        year: billDate.getFullYear(),
       });
 
       // Increment category usage count
@@ -98,8 +149,8 @@ module.exports = {
           `• Mã: \`${bill.code}\`\n` +
           `• Loại: ${displayCategory}\n` +
           `• Số tiền: ${formattedAmount} VNĐ\n` +
-          `• Mô tả: ${description || "Không có"}\n` +
-          `• Ngày: ${now.toLocaleDateString("vi-VN")}\n\n` +
+          `• Mô tả: ${escapeMarkdown(description) || "Không có"}\n` +
+          `• Ngày: ${billDate.toLocaleDateString("vi-VN")}\n\n` +
           `Dùng /listbills để xem tất cả hóa đơn`,
         { parse_mode: "Markdown" }
       );

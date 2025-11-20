@@ -4,6 +4,7 @@
  */
 
 const Bill = require("../../models/Bill");
+const { escapeMarkdown } = require("../../utils/response");
 
 module.exports = {
   name: "deletebill",
@@ -54,9 +55,9 @@ module.exports = {
       await ctx.reply(
         `✅ *Đã xóa hóa đơn thành công!*\n\n` +
           `📝 *Thông tin hóa đơn đã xóa:*\n` +
-          `• Loại: ${billInfo.category}\n` +
+          `• Loại: ${escapeMarkdown(billInfo.category)}\n` +
           `• Số tiền: ${formattedAmount} VNĐ\n` +
-          `• Mô tả: ${billInfo.description || "Không có"}\n` +
+          `• Mô tả: ${escapeMarkdown(billInfo.description) || "Không có"}\n` +
           `• Ngày: ${billInfo.date}`,
         { parse_mode: "Markdown" }
       );

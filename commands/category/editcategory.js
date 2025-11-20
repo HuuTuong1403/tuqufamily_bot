@@ -44,7 +44,6 @@ module.exports = {
     try {
       // Find the category
       const category = await Category.findOne({
-        userId: ctx.from.id,
         code: code,
       });
 

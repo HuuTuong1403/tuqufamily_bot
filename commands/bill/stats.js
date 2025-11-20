@@ -4,6 +4,7 @@
  */
 
 const Bill = require("../../models/Bill");
+const { escapeMarkdown } = require("../../utils/response");
 
 module.exports = {
   name: "stats",
@@ -30,17 +31,12 @@ module.exports = {
     }
 
     try {
-      const monthlyTotal = await Bill.getMonthlyTotal(
-        ctx.from.id,
-        month,
-        year
-      );
+      const monthlyTotal = await Bill.getMonthlyTotal(ctx.from.id, month, year);
       const byCategory = await Bill.getTotalByCategory(
         ctx.from.id,
         month,
         year
       );
-      console.log("🚀 => byCategory:", byCategory)
 
       if (monthlyTotal.count === 0) {
         return ctx.reply(
@@ -65,7 +61,7 @@ module.exports = {
         const formatted = cat.total.toLocaleString("vi-VN");
         const bars = "█".repeat(Math.ceil(parseFloat(percentage) / 10));
 
-        message += `${index + 1}. *${cat._id.name}*\n`;
+        message += `${index + 1}. *${escapeMarkdown(cat._id.name)}*\n`;
         message += `   💵 ${formatted} VNĐ (${percentage}%)\n`;
         message += `   ${bars}\n`;
         message += `   📊 ${cat.count} hóa đơn\n\n`;
@@ -101,4 +97,3 @@ module.exports = {
     }
   },
 };
-

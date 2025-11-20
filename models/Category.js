@@ -7,11 +7,6 @@ const mongoose = require("mongoose");
 
 const categorySchema = new mongoose.Schema(
   {
-    userId: {
-      type: Number,
-      required: true,
-      index: true,
-    },
     code: {
       type: String,
       required: true,
@@ -48,15 +43,15 @@ const categorySchema = new mongoose.Schema(
 );
 
 // Unique index for userId and name combination
-categorySchema.index({ userId: 1, name: 1 }, { unique: true });
+categorySchema.index({ code: 1 }, { unique: true });
 
 // Static method to get user's categories
-categorySchema.statics.getUserCategories = async function (userId) {
-  return await this.find({ userId }).sort({ usageCount: -1, displayName: 1 });
+categorySchema.statics.getCategories = async function () {
+  return await this.find().sort({ usageCount: -1, displayName: 1 });
 };
 
 // Static method to find or create default categories for new user
-categorySchema.statics.initDefaultCategories = async function (userId) {
+categorySchema.statics.initDefaultCategories = async function () {
   const defaultCategories = [
     {
       code: "thuenha",
@@ -78,36 +73,30 @@ categorySchema.statics.initDefaultCategories = async function (userId) {
     },
   ];
 
-  const existingCount = await this.countDocuments({ userId });
+  const existingCount = await this.countDocuments({});
 
   if (existingCount === 0) {
     const categories = defaultCategories.map((cat) => ({
       ...cat,
-      userId,
+
       isDefault: true,
     }));
 
     await this.insertMany(categories);
-    console.log(
-      `✅ Initialized ${categories.length} default categories for user ${userId}`
-    );
+    console.log(`✅ Initialized ${categories.length} default categories`);
   }
 
-  return await this.getUserCategories(userId);
+  return await this.getCategories();
 };
 
 // Static method to increment usage count
-categorySchema.statics.incrementUsage = async function (userId, categoryCode) {
-  await this.updateOne(
-    { userId, code: categoryCode },
-    { $inc: { usageCount: 1 } }
-  );
+categorySchema.statics.incrementUsage = async function (categoryCode) {
+  await this.updateOne({ code: categoryCode }, { $inc: { usageCount: 1 } });
 };
 
 // Static method to check if category exists
-categorySchema.statics.categoryExists = async function (userId, categoryCode) {
+categorySchema.statics.categoryExists = async function (categoryCode) {
   const count = await this.countDocuments({
-    userId,
     code: categoryCode,
   });
   return count > 0;
