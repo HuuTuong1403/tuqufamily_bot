@@ -3,7 +3,10 @@
  * Hiển thị danh sách hóa đơn
  */
 
+const User = require("../../models/User");
 const Bill = require("../../models/Bill");
+
+const { parseDate } = require("../../utils/function");
 const { escapeMarkdown } = require("../../utils/response");
 
 module.exports = {
@@ -11,36 +14,62 @@ module.exports = {
   description: "Xem danh sách hóa đơn",
   usage: "/listbills [tháng] [năm]",
 
+  async getBills(params) {
+    for (let key in params) {
+      if (!params[key]) {
+        delete params[key];
+      }
+    }
+
+    return await Bill.find(params).sort({ date: -1 });
+  },
+
   async execute(ctx, args) {
-    const now = new Date();
-    let month = now.getMonth() + 1;
-    let year = now.getFullYear();
-
-    // Parse month and year from args if provided
-    if (args.length >= 1) {
-      const parsedMonth = parseInt(args[0]);
-      if (!isNaN(parsedMonth) && parsedMonth >= 1 && parsedMonth <= 12) {
-        month = parsedMonth;
-      }
-    }
-    if (args.length >= 2) {
-      const parsedYear = parseInt(args[1]);
-      if (!isNaN(parsedYear) && parsedYear >= 2020 && parsedYear <= 2100) {
-        year = parsedYear;
-      }
-    }
-
     try {
-      const bills = await Bill.find({
-        userId: ctx.from.id,
-        month: month,
-        year: year,
-      }).sort({ date: -1 });
+      const params = {
+        userId: "",
+        month: 0,
+        year: 0,
+        date: null,
+      };
+      let isFilterDate = false;
+
+      const firstArgs = args[0];
+      const user = await User.findOne({ username: firstArgs });
+
+      if (user) {
+        params.userId = user.telegramId;
+        const parsedDate = parseDate(args[1]);
+
+        if (parsedDate) {
+          params.date = parsedDate;
+          isFilterDate = true;
+        } else {
+          params.month = this.getMonthYear(args[1], "month");
+          params.year = this.getMonthYear(args[2], "year");
+        }
+      } else {
+        const parsedDate = parseDate(args[0]);
+
+        if (parsedDate) {
+          params.date = parsedDate;
+          isFilterDate = true;
+        } else {
+          params.month = this.getMonthYear(args[0], "month");
+          params.year = this.getMonthYear(args[1], "year");
+        }
+      }
+
+      const bills = await this.getBills(params);
 
       if (bills.length === 0) {
         return ctx.reply(
           `📋 *Không có hóa đơn nào*\n\n` +
-            `Không tìm thấy hóa đơn cho tháng ${month}/${year}\n\n` +
+            `Không tìm thấy hóa đơn cho ${
+              isFilterDate
+                ? `ngày ${params.date.toLocaleDateString("vi-VN")}`
+                : `tháng ${params.month}/${params.year}`
+            }\n\n` +
             `Dùng /addbill để thêm hóa đơn mới`,
           { parse_mode: "Markdown" }
         );
@@ -63,7 +92,11 @@ module.exports = {
         byCategory[bill.category].count += 1;
       });
 
-      let message = `📊 *Hóa đơn tháng ${month}/${year}*\n\n`;
+      let message = `📊 *Hóa đơn ${
+        isFilterDate
+          ? `ngày ${params.date.toLocaleDateString("vi-VN")}`
+          : `tháng ${params.month}/${params.year}`
+      }*\n\n`;
 
       // Summary by category
       message += `*📈 Tổng quan theo loại:*\n`;
@@ -106,10 +139,12 @@ module.exports = {
       }
 
       message += `\n\n📌 *Lệnh hữu ích:*\n`;
-      message += `• /editbill <mã> <trường> <giá trị> - Sửa hóa đơn\n`;
-      message += `• /paidbill <mã> - Đánh dấu đã thanh toán\n`;
-      message += `• /unpaidbill <mã> - Đánh dấu chưa thanh toán\n`;
-      message += `• /deletebill <mã> - Xóa hóa đơn`;
+      message +=
+        "• /listbills <username> <ngày/tháng/năm> <tháng> <năm> - Xem hóa đơn của người dùng theo ngày hoặc tháng năm\n";
+      message += "• /editbill <mã> <trường> <giá trị> - Sửa hóa đơn\n";
+      message += "• /paidbill <mã> - Đánh dấu đã thanh toán\n";
+      message += "• /unpaidbill <mã> - Đánh dấu chưa thanh toán\n";
+      message += "• /deletebill <mã> - Xóa hóa đơn\n";
 
       await ctx.reply(message, { parse_mode: "Markdown" });
     } catch (error) {
@@ -117,6 +152,30 @@ module.exports = {
       await ctx.reply(
         `❌ Có lỗi xảy ra khi lấy danh sách hóa đơn. Vui lòng thử lại sau.`
       );
+    }
+  },
+
+  getMonthYear(data, type) {
+    if (!data) return null;
+
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const year = now.getFullYear();
+
+    if (type === "month") {
+      const parsedMonth = parseInt(data);
+      if (!isNaN(parsedMonth) && parsedMonth >= 1 && parsedMonth <= 12) {
+        return parsedMonth;
+      }
+      return month;
+    }
+
+    if (type === "year") {
+      const parsedYear = parseInt(data);
+      if (!isNaN(parsedYear) && parsedYear >= 2020 && parsedYear <= 2100) {
+        return parsedYear;
+      }
+      return year;
     }
   },
 };

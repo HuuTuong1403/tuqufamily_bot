@@ -25,7 +25,11 @@ Hoặc: \`/editbill bill1 date 15/11/2025\`
 
 📋 *Xem danh sách:*
 \`/listbills\` - Xem hóa đơn tháng này
-\`/listbills 10 2025\` - Xem hóa đơn tháng 10/2025
+\`/listbills 10 2025\` - Xem tất cả hóa đơn trong tháng 10/2025
+\`/listbills 20/11/2025\` - Xem hóa đơn trong ngày 20/11/2025
+\`/listbills tuong0704\` - Xem hóa đơn của user tuong0704 thanh toán
+\`/listbills tuong0704 20/11/2025\` - Xem hóa đơn của user tuong0704 thanh toán ngày 20/11/2025
+\`/listbills tuong0704 10 2025\` - Xem hóa đơn của user tuong0704 thánh toán trong tháng 10/2025
 
 📊 *Thống kê:*
 \`/stats\` - Thống kê tháng này
@@ -48,7 +52,7 @@ Hoặc: \`/editbill bill1 date 15/11/2025\`
 /start - Khởi tạo bot
 /about - Thông tin về bot
 
-Cần thêm trợ giúp? Liên hệ admin! 😊
+Cần thêm trợ giúp? Liên hệ Tường Tỉnh Táo! 😊
     `;
 
     await ctx.reply(helpMessage, { parse_mode: "Markdown" });
