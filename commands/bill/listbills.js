@@ -6,7 +6,7 @@
 const User = require("../../models/User");
 const Bill = require("../../models/Bill");
 
-const { parseDate } = require("../../utils/function");
+const { parseDate, parseMonthYear } = require("../../utils/function");
 const { escapeMarkdown } = require("../../utils/response");
 
 module.exports = {
@@ -35,28 +35,37 @@ module.exports = {
       let isFilterDate = false;
 
       const firstArgs = args[0];
+
       const user = await User.findOne({ username: firstArgs });
 
       if (user) {
         params.userId = user.telegramId;
-        const parsedDate = parseDate(args[1]);
+        let parsedDate = parseDate(args[1]);
 
         if (parsedDate) {
           params.date = parsedDate;
           isFilterDate = true;
         } else {
-          params.month = this.getMonthYear(args[1], "month");
-          params.year = this.getMonthYear(args[2], "year");
+          parsedDate = parseMonthYear(args[1]);
+
+          if (parsedDate) {
+            params.month = parsedDate.getMonth() + 1;
+            params.year = parsedDate.getFullYear();
+          }
         }
       } else {
-        const parsedDate = parseDate(args[0]);
+        let parsedDate = parseDate(args[0]);
 
         if (parsedDate) {
           params.date = parsedDate;
           isFilterDate = true;
         } else {
-          params.month = this.getMonthYear(args[0], "month");
-          params.year = this.getMonthYear(args[1], "year");
+          parsedDate = parseMonthYear(args[0]);
+
+          if (parsedDate) {
+            params.month = parsedDate.getMonth() + 1;
+            params.year = parsedDate.getFullYear();
+          }
         }
       }
 
@@ -81,15 +90,15 @@ module.exports = {
       // Group by category
       const byCategory = {};
       bills.forEach((bill) => {
-        if (!byCategory[bill.category]) {
-          byCategory[bill.category] = {
+        if (!byCategory[bill.category.code]) {
+          byCategory[bill.category.code] = {
             total: 0,
             count: 0,
             name: bill.category.name,
           };
         }
-        byCategory[bill.category].total += bill.amount;
-        byCategory[bill.category].count += 1;
+        byCategory[bill.category.code].total += bill.amount;
+        byCategory[bill.category.code].count += 1;
       });
 
       let message = `📊 *Hóa đơn ${
@@ -140,10 +149,12 @@ module.exports = {
 
       message += `\n\n📌 *Lệnh hữu ích:*\n`;
       message +=
-        "• /listbills <username> <ngày/tháng/năm> <tháng> <năm> - Xem hóa đơn của người dùng theo ngày hoặc tháng năm\n";
+        "• /listbills <username> <ngày/tháng/năm | tháng/năm> - Xem hóa đơn của người dùng theo ngày hoặc tháng năm\n";
       message += "• /editbill <mã> <trường> <giá trị> - Sửa hóa đơn\n";
-      message += "• /paidbill <mã> - Đánh dấu đã thanh toán\n";
-      message += "• /unpaidbill <mã> - Đánh dấu chưa thanh toán\n";
+      message +=
+        "• /paidbill <all | mã | ngày/tháng/năm | tháng/năm> - Đánh dấu hóa đơn của bạn đã thanh toán\n";
+      message +=
+        "• /unpaidbill <all | mã | ngày/tháng/năm | tháng/năm> - Đánh dấu hóa đơn của bạn chưa thanh toán\n";
       message += "• /deletebill <mã> - Xóa hóa đơn\n";
 
       await ctx.reply(message, { parse_mode: "Markdown" });
@@ -152,30 +163,6 @@ module.exports = {
       await ctx.reply(
         `❌ Có lỗi xảy ra khi lấy danh sách hóa đơn. Vui lòng thử lại sau.`
       );
-    }
-  },
-
-  getMonthYear(data, type) {
-    if (!data) return null;
-
-    const now = new Date();
-    const month = now.getMonth() + 1;
-    const year = now.getFullYear();
-
-    if (type === "month") {
-      const parsedMonth = parseInt(data);
-      if (!isNaN(parsedMonth) && parsedMonth >= 1 && parsedMonth <= 12) {
-        return parsedMonth;
-      }
-      return month;
-    }
-
-    if (type === "year") {
-      const parsedYear = parseInt(data);
-      if (!isNaN(parsedYear) && parsedYear >= 2020 && parsedYear <= 2100) {
-        return parsedYear;
-      }
-      return year;
     }
   },
 };

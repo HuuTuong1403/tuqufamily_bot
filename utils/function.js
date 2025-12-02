@@ -37,6 +37,36 @@ function parseDate(dateStr) {
   return date;
 }
 
+function parseMonthYear(monthYearStr) {
+  if (!monthYearStr) {
+    return new Date();
+  }
+
+  const monthYearPattern = /^(\d{1,2})\/(\d{4})$/;
+  const match = monthYearStr.match(monthYearPattern);
+
+  if (!match) return null;
+
+  const month = parseInt(match[1]);
+  const year = parseInt(match[2]);
+
+  // Validate ranges
+  if (month < 1 || month > 12 || year < 2000 || year > 2100) {
+    return null;
+  }
+
+  // Create date object (first day of the month)
+  const date = new Date(year, month - 1, 1);
+
+  // Check if date is valid
+  if (date.getMonth() !== month - 1 || date.getFullYear() !== year) {
+    return null;
+  }
+
+  return date;
+}
+
 module.exports = {
   parseDate,
+  parseMonthYear,
 };
