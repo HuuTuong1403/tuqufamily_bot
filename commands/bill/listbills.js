@@ -12,16 +12,19 @@ const { escapeMarkdown } = require("../../utils/response");
 module.exports = {
   name: "listbills",
   description: "Xem danh sách hóa đơn",
-  usage: "/listbills [tháng] [năm]",
+  usage: "/listbills [username] [ngày/tháng/năm | tháng/năm] [paid|unpaid]",
 
   async getBills(params) {
+    const query = {};
     for (let key in params) {
-      if (!params[key]) {
-        delete params[key];
+      if (key === "isPaid") {
+        query[key] = params[key];
+      } else if (params[key]) {
+        query[key] = params[key];
       }
     }
 
-    return await Bill.find(params).sort({ date: -1 });
+    return await Bill.find(query).sort({ date: -1 });
   },
 
   async execute(ctx, args) {
@@ -31,8 +34,20 @@ module.exports = {
         month: 0,
         year: 0,
         date: null,
+        isPaid: false,
       };
       let isFilterDate = false;
+      let isPaidLabel = "Chưa thanh toán";
+
+      // Tách keyword paid/unpaid khỏi args trước khi xử lý
+      const statusIndex = args.findIndex(
+        (a) => a.toLowerCase() === "paid" || a.toLowerCase() === "unpaid"
+      );
+      if (statusIndex !== -1) {
+        const statusArg = args.splice(statusIndex, 1)[0].toLowerCase();
+        params.isPaid = statusArg === "paid";
+        isPaidLabel = params.isPaid ? "Đã thanh toán" : "Chưa thanh toán";
+      }
 
       const firstArgs = args[0];
 
@@ -71,14 +86,14 @@ module.exports = {
 
       const bills = await this.getBills(params);
 
+      const periodLabel = isFilterDate
+        ? `ngày ${params.date.toLocaleDateString("vi-VN")}`
+        : `tháng ${params.month}/${params.year}`;
+
       if (bills.length === 0) {
         return ctx.reply(
           `📋 *Không có hóa đơn nào*\n\n` +
-            `Không tìm thấy hóa đơn cho ${
-              isFilterDate
-                ? `ngày ${params.date.toLocaleDateString("vi-VN")}`
-                : `tháng ${params.month}/${params.year}`
-            }\n\n` +
+            `Không tìm thấy hóa đơn *${isPaidLabel}* cho ${periodLabel}\n\n` +
             `Dùng /addbill để thêm hóa đơn mới`,
           { parse_mode: "Markdown" }
         );
@@ -101,11 +116,8 @@ module.exports = {
         byCategory[bill.category.code].count += 1;
       });
 
-      let message = `📊 *Hóa đơn ${
-        isFilterDate
-          ? `ngày ${params.date.toLocaleDateString("vi-VN")}`
-          : `tháng ${params.month}/${params.year}`
-      }*\n\n`;
+      const statusIcon = params.isPaid ? "✅" : "❌";
+      let message = `📊 *Hóa đơn ${periodLabel}* ${statusIcon} ${isPaidLabel}\n\n`;
 
       // Summary by category
       message += `*📈 Tổng quan theo loại:*\n`;
@@ -149,7 +161,7 @@ module.exports = {
 
       message += `\n\n📌 *Lệnh hữu ích:*\n`;
       message +=
-        "• /listbills <username> <ngày/tháng/năm | tháng/năm> - Xem hóa đơn của người dùng theo ngày hoặc tháng năm\n";
+        "• /listbills [username] [ngày/tháng/năm | tháng/năm] [paid|unpaid] - Xem hóa đơn (mặc định: unpaid)\n";
       message += "• /editbill <mã> <trường> <giá trị> - Sửa hóa đơn\n";
       message +=
         "• /paidbill <all | mã | ngày/tháng/năm | tháng/năm> - Đánh dấu hóa đơn của bạn đã thanh toán\n";
