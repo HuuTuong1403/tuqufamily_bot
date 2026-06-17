@@ -18,6 +18,8 @@ Tôi là trợ lý quản lý chi tiêu của bạn. Tôi có thể giúp bạn:
 • /listbills - Xem danh sách hóa đơn
 • /deletebill - Xóa hóa đơn
 • /stats - Thống kê chi tiêu
+• /balance - Đối soát công nợ giữa thành viên
+• /export - Xuất báo cáo CSV + biểu đồ
 
 *🏷️ Quản lý loại chi tiêu:*
 • /categories - Xem các loại

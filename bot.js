@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { Telegraf } = require("telegraf");
 const commandHandler = require("./commands");
+const { handleCallback } = require("./callbacks");
 const logger = require("./middlewares/logger");
 const errorHandler = require("./middlewares/errorHandler");
 const auth = require("./middlewares/auth");
@@ -44,8 +45,7 @@ bot.on("text", async (ctx) => {
 
 // Handle callback queries (for inline keyboards)
 bot.on("callback_query", async (ctx) => {
-  await ctx.answerCbQuery();
-  // Handle callback data here
+  await handleCallback(ctx);
 });
 
 module.exports = bot;

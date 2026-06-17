@@ -16,12 +16,12 @@ module.exports = {
         `❌ *Cú pháp không đúng!*\n\n` +
           `*Cách dùng:* /editcategory <mã> <trường> <giá trị>\n\n` +
           `*Các trường có thể sửa:*\n` +
-          `• displayName - Tên hiển thị\n` +
+          `• name - Tên hiển thị\n` +
           `• icon - Icon (emoji)\n` +
           `• description - Mô tả\n\n` +
           `*Ví dụ:*\n` +
           `/editcategory "y tế" icon 💊\n` +
-          `/editcategory laptop displayName "Máy tính"\n` +
+          `/editcategory laptop name "Máy tính"\n` +
           `/editcategory gas description "Gas nấu ăn hàng tháng"`,
         { parse_mode: "Markdown" }
       );
@@ -32,11 +32,11 @@ module.exports = {
     const value = args.slice(2).join(" ");
 
     // Validate field
-    const allowedFields = ["displayname", "icon", "description"];
+    const allowedFields = ["name", "displayname", "icon", "description"];
     if (!allowedFields.includes(field)) {
       return ctx.reply(
         `❌ *Trường không hợp lệ!*\n\n` +
-          `Các trường có thể sửa: displayName, icon, description`,
+          `Các trường có thể sửa: name, icon, description`,
         { parse_mode: "Markdown" }
       );
     }
@@ -59,8 +59,9 @@ module.exports = {
       // Update the field
       const updates = {};
       switch (field) {
+        case "name":
         case "displayname":
-          updates.displayName = value;
+          updates.name = value;
           break;
         case "icon":
           updates.icon = value.length <= 2 ? value : "📦";

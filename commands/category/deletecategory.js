@@ -53,13 +53,13 @@ module.exports = {
 
       // Check if there are bills using this category
       const billCount = await Bill.countDocuments({
-        category: code,
+        "category.code": code,
       });
 
-      if (billCount > 0) {
+      if (billCount > 0 && !(args.length >= 2 && args[1] === "confirm")) {
         return ctx.reply(
           `⚠️ *Cảnh báo!*\n\n` +
-            `Có ${billCount} hóa đơn đang sử dụng loại "${billCount.category.name}".\n\n` +
+            `Có ${billCount} hóa đơn đang sử dụng loại "${category.name}".\n\n` +
             `Nếu xóa loại này, các hóa đơn sẽ không bị xóa nhưng sẽ hiển thị loại không xác định.\n\n` +
             `Để xác nhận xóa, dùng:\n` +
             `/deletecategory ${code} confirm`,

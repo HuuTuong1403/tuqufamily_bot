@@ -101,7 +101,7 @@ module.exports = {
       });
 
       // Increment category usage count
-      await Category.incrementUsage(ctx.from.id, category);
+      await Category.incrementUsage(category);
 
       const formattedAmount = amount.toLocaleString("vi-VN");
       const displayCategory = `${categoryInfo.icon} ${categoryInfo.name}`;

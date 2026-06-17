@@ -35,9 +35,18 @@ Hoặc: \`/editbill bill1 date 15/11/2025\`
 \`/stats\` - Thống kê tháng này
 \`/stats 10 2025\` - Thống kê tháng 10/2025
 
+🤝 *Đối soát công nợ:*
+\`/balance\` - Chia đều chi tiêu tháng này, gợi ý ai trả ai
+\`/balance 10/2025\` - Đối soát tháng 10/2025
+
+📤 *Xuất báo cáo:*
+\`/export\` - Xuất CSV + biểu đồ tháng này
+\`/export 10/2025\` - Xuất báo cáo tháng 10/2025
+
 ✅ *Thanh toán hóa đơn:*
 \`/paidbill <mã>\` - Đánh dấu hóa đơn đã thanh toán
 \`/unpaidbill <mã>\` - Đánh dấu hóa đơn chưa thanh toán
+💡 Trong /listbills có nút bấm nhanh để đánh dấu đã trả / xóa
 
 🗑️ *Xóa hóa đơn:*
 \`/deletebill <mã>\` - Xóa hóa đơn theo mã
