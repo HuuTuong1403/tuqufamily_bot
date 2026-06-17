@@ -12,7 +12,7 @@ const { escapeMarkdown } = require("../../utils/response");
 module.exports = {
   name: "balance",
   description: "Đối soát công nợ giữa các thành viên",
-  usage: "/balance [tháng/năm]",
+  usage: "/balance [tháng/năm | all]",
 
   /**
    * Build settlement suggestions using a greedy algorithm.
@@ -57,22 +57,34 @@ module.exports = {
 
   async execute(ctx, args) {
     try {
+      const isAll = args[0] && args[0].toLowerCase() === "all";
+
       const now = new Date();
       let month = now.getMonth() + 1;
       let year = now.getFullYear();
+      let match;
+      let periodLabel;
 
-      if (args[0]) {
-        const parsed = parseMonthYear(args[0]);
-        if (!parsed) {
-          return ctx.reply(
-            `❌ *Định dạng không đúng!*\n\n` +
-              `*Cách dùng:* /balance [tháng/năm]\n\n` +
-              `*Ví dụ:*\n/balance\n/balance 6/2026`,
-            { parse_mode: "Markdown" }
-          );
+      if (isAll) {
+        // Toàn bộ hóa đơn chưa thanh toán, không giới hạn thời gian
+        match = { isPaid: false };
+        periodLabel = "tất cả hóa đơn chưa thanh toán";
+      } else {
+        if (args[0]) {
+          const parsed = parseMonthYear(args[0]);
+          if (!parsed) {
+            return ctx.reply(
+              `❌ *Định dạng không đúng!*\n\n` +
+                `*Cách dùng:* /balance [tháng/năm | all]\n\n` +
+                `*Ví dụ:*\n/balance\n/balance 6/2026\n/balance all`,
+              { parse_mode: "Markdown" }
+            );
+          }
+          month = parsed.getMonth() + 1;
+          year = parsed.getFullYear();
         }
-        month = parsed.getMonth() + 1;
-        year = parsed.getFullYear();
+        match = { month, year };
+        periodLabel = `tháng ${month}/${year}`;
       }
 
       const members = await User.find().sort({ joinedAt: 1 });
@@ -86,7 +98,7 @@ module.exports = {
 
       // Tổng số tiền mỗi thành viên đã trả trong kỳ
       const paidByUser = await Bill.aggregate([
-        { $match: { month, year } },
+        { $match: match },
         { $group: { _id: "$userId", total: { $sum: "$amount" } } },
       ]);
 
@@ -99,8 +111,8 @@ module.exports = {
 
       if (total === 0) {
         return ctx.reply(
-          `📊 *Đối soát tháng ${month}/${year}*\n\n` +
-            `Chưa có chi tiêu nào trong tháng này.`,
+          `📊 *Đối soát ${periodLabel}*\n\n` +
+            `Chưa có hóa đơn nào phù hợp.`,
           { parse_mode: "Markdown" }
         );
       }
@@ -117,7 +129,7 @@ module.exports = {
         };
       });
 
-      let message = `📊 *Đối soát chi tiêu tháng ${month}/${year}*\n\n`;
+      let message = `📊 *Đối soát chi tiêu ${periodLabel}*\n\n`;
       message += `💰 *Tổng chi tiêu:* ${total.toLocaleString("vi-VN")} VNĐ\n`;
       message += `👥 *Số thành viên:* ${memberCount}\n`;
       message += `🧮 *Mỗi người chịu:* ${Math.round(share).toLocaleString(

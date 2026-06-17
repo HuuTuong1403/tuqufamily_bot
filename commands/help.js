@@ -24,12 +24,13 @@ Ví dụ: \`/editbill bill1 amount 600000\`
 Hoặc: \`/editbill bill1 date 15/11/2025\`
 
 📋 *Xem danh sách:*
-\`/listbills\` - Xem hóa đơn tháng này
-\`/listbills 10 2025\` - Xem tất cả hóa đơn trong tháng 10/2025
+\`/listbills\` - Xem hóa đơn chưa thanh toán tháng này
+\`/listbills all\` - Xem tất cả hóa đơn chưa thanh toán (mọi thời gian)
+\`/listbills all paid\` - Xem tất cả hóa đơn đã thanh toán
+\`/listbills 10/2025\` - Xem hóa đơn trong tháng 10/2025
 \`/listbills 20/11/2025\` - Xem hóa đơn trong ngày 20/11/2025
-\`/listbills tuong0704\` - Xem hóa đơn của user tuong0704 thanh toán
-\`/listbills tuong0704 20/11/2025\` - Xem hóa đơn của user tuong0704 thanh toán ngày 20/11/2025
-\`/listbills tuong0704 10 2025\` - Xem hóa đơn của user tuong0704 thánh toán trong tháng 10/2025
+\`/listbills tuong0704\` - Xem hóa đơn của user tuong0704
+\`/listbills tuong0704 20/11/2025\` - Hóa đơn của tuong0704 ngày 20/11/2025
 
 📊 *Thống kê:*
 \`/stats\` - Thống kê tháng này
@@ -38,6 +39,7 @@ Hoặc: \`/editbill bill1 date 15/11/2025\`
 🤝 *Đối soát công nợ:*
 \`/balance\` - Chia đều chi tiêu tháng này, gợi ý ai trả ai
 \`/balance 10/2025\` - Đối soát tháng 10/2025
+\`/balance all\` - Đối soát toàn bộ hóa đơn chưa thanh toán
 
 📤 *Xuất báo cáo:*
 \`/export\` - Xuất CSV + biểu đồ tháng này

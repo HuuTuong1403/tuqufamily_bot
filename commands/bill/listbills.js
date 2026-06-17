@@ -14,14 +14,16 @@ const PAGE_SIZE = 5;
 module.exports = {
   name: "listbills",
   description: "Xem danh sách hóa đơn",
-  usage: "/listbills [username] [ngày/tháng/năm | tháng/năm] [paid|unpaid]",
+  usage: "/listbills [username] [ngày/tháng/năm | tháng/năm | all] [paid|unpaid]",
 
   async getBills(params) {
     const query = {};
     if (params.userId) query.userId = params.userId;
-    if (params.date) query.date = params.date;
-    if (params.month) query.month = params.month;
-    if (params.year) query.year = params.year;
+    if (!params.all) {
+      if (params.date) query.date = params.date;
+      if (params.month) query.month = params.month;
+      if (params.year) query.year = params.year;
+    }
     query.isPaid = !!params.isPaid;
 
     return await Bill.find(query).sort({ date: -1 });
@@ -38,11 +40,12 @@ module.exports = {
       params.year || 0,
       params.date ? params.date.getTime() : 0,
       params.isPaid ? 1 : 0,
+      params.all ? 1 : 0,
     ].join("~");
   },
 
   decodeContext(str) {
-    const [page, userId, month, year, dateMs, isPaid] = str
+    const [page, userId, month, year, dateMs, isPaid, all] = str
       .split("~")
       .map((v) => parseInt(v, 10) || 0);
     return {
@@ -53,6 +56,7 @@ module.exports = {
         year: year || 0,
         date: dateMs ? new Date(dateMs) : null,
         isPaid: isPaid === 1,
+        all: all === 1,
       },
     };
   },
@@ -107,7 +111,9 @@ module.exports = {
 
     const isFilterDate = !!params.date;
     const isPaidLabel = params.isPaid ? "Đã thanh toán" : "Chưa thanh toán";
-    const periodLabel = isFilterDate
+    const periodLabel = params.all
+      ? "tất cả thời gian"
+      : isFilterDate
       ? `ngày ${params.date.toLocaleDateString("vi-VN")}`
       : `tháng ${params.month}/${params.year}`;
 
@@ -195,6 +201,7 @@ module.exports = {
         year: 0,
         date: null,
         isPaid: false,
+        all: false,
       };
       let isFilterDate = false;
 
@@ -205,6 +212,13 @@ module.exports = {
       if (statusIndex !== -1) {
         const statusArg = args.splice(statusIndex, 1)[0].toLowerCase();
         params.isPaid = statusArg === "paid";
+      }
+
+      // Tách keyword "all" -> bỏ lọc theo thời gian (xem toàn bộ)
+      const allIndex = args.findIndex((a) => a.toLowerCase() === "all");
+      if (allIndex !== -1) {
+        args.splice(allIndex, 1);
+        params.all = true;
       }
 
       const firstArgs = args[0];
@@ -242,8 +256,8 @@ module.exports = {
         }
       }
 
-      // Mặc định lọc theo tháng hiện tại nếu không nhập ngày/tháng
-      if (!isFilterDate && !params.month && !params.year) {
+      // Mặc định lọc theo tháng hiện tại nếu không nhập ngày/tháng (trừ khi xem tất cả)
+      if (!params.all && !isFilterDate && !params.month && !params.year) {
         const now = new Date();
         params.month = now.getMonth() + 1;
         params.year = now.getFullYear();
@@ -258,8 +272,10 @@ module.exports = {
       let message = result.text;
       message += `\n📌 *Lệnh hữu ích:*\n`;
       message +=
-        "• /listbills [username] [ngày/tháng/năm | tháng/năm] [paid|unpaid] - Xem hóa đơn (mặc định: unpaid)\n";
-      message += "• /balance [tháng/năm] - Đối soát công nợ giữa thành viên\n";
+        "• /listbills [username] [ngày/tháng/năm | tháng/năm | all] [paid|unpaid] - Xem hóa đơn (mặc định: tháng này, unpaid)\n";
+      message += "• /listbills all - Xem tất cả hóa đơn chưa thanh toán\n";
+      message +=
+        "• /balance [tháng/năm | all] - Đối soát công nợ (all = mọi hóa đơn chưa thanh toán)\n";
       message += "• /export [tháng/năm] - Xuất CSV + biểu đồ chi tiêu\n";
 
       await ctx.reply(message, result.extra);
