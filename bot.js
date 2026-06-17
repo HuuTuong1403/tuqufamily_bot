@@ -2,6 +2,7 @@ require("dotenv").config();
 const { Telegraf } = require("telegraf");
 const commandHandler = require("./commands");
 const { handleCallback } = require("./callbacks");
+const addbillFlow = require("./flows/addbill");
 const logger = require("./middlewares/logger");
 const errorHandler = require("./middlewares/errorHandler");
 const auth = require("./middlewares/auth");
@@ -38,6 +39,12 @@ bot.on("text", async (ctx) => {
 
   // Skip if it's a command (already handled)
   if (text.startsWith("/")) return;
+
+  // Nếu người dùng đang trong flow thêm hóa đơn, chuyển cho flow xử lý
+  if (addbillFlow.hasActiveFlow(ctx)) {
+    const handled = await addbillFlow.handleText(ctx);
+    if (handled) return;
+  }
 
   // Echo non-command messages
   await ctx.reply(`You said: ${text}\n\nTry /help to see available commands.`);

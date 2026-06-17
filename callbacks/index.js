@@ -6,6 +6,7 @@
 
 const Bill = require("../models/Bill");
 const listbills = require("../commands/bill/listbills");
+const addbillFlow = require("../flows/addbill");
 
 /**
  * Render lại danh sách hóa đơn vào tin nhắn hiện tại.
@@ -98,16 +99,21 @@ async function handleCallback(ctx) {
   const prefix = parts[0];
   const action = parts[1];
 
-  // Hiện chỉ phục vụ nhóm "lb" (listbills)
-  if (prefix === "lb" && handlers[action]) {
-    try {
+  try {
+    // Nhóm "lb": danh sách hóa đơn
+    if (prefix === "lb" && handlers[action]) {
       return await handlers[action](ctx, parts.slice(2));
-    } catch (error) {
-      console.error(`Error handling callback ${data}:`, error);
-      return ctx.answerCbQuery("Có lỗi xảy ra, vui lòng thử lại.", {
-        show_alert: true,
-      });
     }
+
+    // Nhóm "ab": flow thêm hóa đơn tương tác
+    if (prefix === "ab") {
+      return await addbillFlow.handleCallback(ctx, action, parts.slice(2));
+    }
+  } catch (error) {
+    console.error(`Error handling callback ${data}:`, error);
+    return ctx.answerCbQuery("Có lỗi xảy ra, vui lòng thử lại.", {
+      show_alert: true,
+    });
   }
 
   return ctx.answerCbQuery();
